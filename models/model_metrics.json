@@ -1,0 +1,355 @@
+{
+  "best_model": "SVM",
+  "selection_reason": "Highest weighted F1-score on held-out 20% test set",
+  "averaging": "weighted",
+  "test_size": 0.2,
+  "train_samples": 979,
+  "test_samples": 245,
+  "models": {
+    "Naive Bayes": {
+      "accuracy": 0.9673,
+      "precision": 0.9687,
+      "recall": 0.9673,
+      "f1_score": 0.9674,
+      "confusion_matrix": [
+        [
+          39,
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          38,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          39,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          41,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          41,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          0,
+          39
+        ]
+      ],
+      "classification_report": {
+        "Account Issue": {
+          "precision": 0.975,
+          "recall": 0.9512195121951219,
+          "f1-score": 0.9629629629629629,
+          "support": 41.0
+        },
+        "Billing Issue": {
+          "precision": 1.0,
+          "recall": 0.926829268292683,
+          "f1-score": 0.9620253164556962,
+          "support": 41.0
+        },
+        "Delivery Issue": {
+          "precision": 0.975,
+          "recall": 0.975,
+          "f1-score": 0.975,
+          "support": 40.0
+        },
+        "Payment Issue": {
+          "precision": 0.9111111111111111,
+          "recall": 1.0,
+          "f1-score": 0.9534883720930233,
+          "support": 41.0
+        },
+        "Service Issue": {
+          "precision": 0.9761904761904762,
+          "recall": 1.0,
+          "f1-score": 0.9879518072289156,
+          "support": 41.0
+        },
+        "Technical Issue": {
+          "precision": 0.975,
+          "recall": 0.9512195121951219,
+          "f1-score": 0.9629629629629629,
+          "support": 41.0
+        },
+        "accuracy": 0.9673469387755103,
+        "macro avg": {
+          "precision": 0.9687169312169311,
+          "recall": 0.9673780487804878,
+          "f1-score": 0.9673985702839268,
+          "support": 245.0
+        },
+        "weighted avg": {
+          "precision": 0.9686912860382247,
+          "recall": 0.9673469387755103,
+          "f1-score": 0.9673675440401878,
+          "support": 245.0
+        }
+      },
+      "classes": [
+        "Account Issue",
+        "Billing Issue",
+        "Delivery Issue",
+        "Payment Issue",
+        "Service Issue",
+        "Technical Issue"
+      ]
+    },
+    "Logistic Regression": {
+      "accuracy": 0.9755,
+      "precision": 0.9772,
+      "recall": 0.9755,
+      "f1_score": 0.9756,
+      "confusion_matrix": [
+        [
+          39,
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          38,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          39,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          41,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          41,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          41
+        ]
+      ],
+      "classification_report": {
+        "Account Issue": {
+          "precision": 1.0,
+          "recall": 0.9512195121951219,
+          "f1-score": 0.975,
+          "support": 41.0
+        },
+        "Billing Issue": {
+          "precision": 1.0,
+          "recall": 0.926829268292683,
+          "f1-score": 0.9620253164556962,
+          "support": 41.0
+        },
+        "Delivery Issue": {
+          "precision": 1.0,
+          "recall": 0.975,
+          "f1-score": 0.9873417721518988,
+          "support": 40.0
+        },
+        "Payment Issue": {
+          "precision": 0.9111111111111111,
+          "recall": 1.0,
+          "f1-score": 0.9534883720930233,
+          "support": 41.0
+        },
+        "Service Issue": {
+          "precision": 0.9761904761904762,
+          "recall": 1.0,
+          "f1-score": 0.9879518072289156,
+          "support": 41.0
+        },
+        "Technical Issue": {
+          "precision": 0.9761904761904762,
+          "recall": 1.0,
+          "f1-score": 0.9879518072289156,
+          "support": 41.0
+        },
+        "accuracy": 0.9755102040816327,
+        "macro avg": {
+          "precision": 0.9772486772486771,
+          "recall": 0.9755081300813009,
+          "f1-score": 0.9756265125264082,
+          "support": 245.0
+        },
+        "weighted avg": {
+          "precision": 0.9771558147068351,
+          "recall": 0.9755102040816327,
+          "f1-score": 0.9755786951401819,
+          "support": 245.0
+        }
+      },
+      "classes": [
+        "Account Issue",
+        "Billing Issue",
+        "Delivery Issue",
+        "Payment Issue",
+        "Service Issue",
+        "Technical Issue"
+      ]
+    },
+    "SVM": {
+      "accuracy": 0.9837,
+      "precision": 0.9851,
+      "recall": 0.9837,
+      "f1_score": 0.9838,
+      "confusion_matrix": [
+        [
+          40,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          38,
+          0,
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          40,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          41,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          41,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          41
+        ]
+      ],
+      "classification_report": {
+        "Account Issue": {
+          "precision": 1.0,
+          "recall": 0.975609756097561,
+          "f1-score": 0.9876543209876543,
+          "support": 41.0
+        },
+        "Billing Issue": {
+          "precision": 1.0,
+          "recall": 0.926829268292683,
+          "f1-score": 0.9620253164556962,
+          "support": 41.0
+        },
+        "Delivery Issue": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 40.0
+        },
+        "Payment Issue": {
+          "precision": 0.9111111111111111,
+          "recall": 1.0,
+          "f1-score": 0.9534883720930233,
+          "support": 41.0
+        },
+        "Service Issue": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 41.0
+        },
+        "Technical Issue": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 41.0
+        },
+        "accuracy": 0.9836734693877551,
+        "macro avg": {
+          "precision": 0.9851851851851853,
+          "recall": 0.983739837398374,
+          "f1-score": 0.9838613349227289,
+          "support": 245.0
+        },
+        "weighted avg": {
+          "precision": 0.9851247165532879,
+          "recall": 0.9836734693877551,
+          "f1-score": 0.9837954628203727,
+          "support": 245.0
+        }
+      },
+      "classes": [
+        "Account Issue",
+        "Billing Issue",
+        "Delivery Issue",
+        "Payment Issue",
+        "Service Issue",
+        "Technical Issue"
+      ]
+    }
+  }
+}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block meta_description %}View overall statistics, complaint distribution charts, and model accuracy.{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+{% block topbar_subtitle %}Overview of customer complaints and classification results{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+  <div>
+    <h2 class="page-title">📊 Dashboard</h2>
+    <p class="page-subtitle">Overview of customer complaints and classification results</p>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid var(--clr-border);padding:6px 14px;border-radius:var(--radius-pill);font-size:12.5px;color:var(--txt-muted);box-shadow:var(--shadow-card);font-weight:600;">
+    📅 All Time Records
+  </div>
+</div>
+
+<!-- 4 KPI Cards (Matching Academic Dashboard Design) -->
+<div class="kpi-grid">
+  <!-- Total Complaints -->
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-title">Total Complaints</div>
+      <div class="kpi-value kpi-value-int">{{ stats.total }}</div>
+      <span class="kpi-badge kpi-badge-blue">All Time</span>
+    </div>
+    <div class="kpi-icon-square" style="background:#EFF6FF;color:#2563EB;">
+      📄
+    </div>
+  </div>
+
+  <!-- Resolved -->
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-title">Resolved</div>
+      <div class="kpi-value kpi-value-int" style="color:#059669;">{{ stats.resolved }}</div>
+      <span class="kpi-badge kpi-badge-green">
+        Current Records ({% if stats.total > 0 %}{{ ((stats.resolved / stats.total)*100)|round(1) }}%{% else %}0%{% endif %})
+      </span>
+    </div>
+    <div class="kpi-icon-square" style="background:#ECFDF5;color:#059669;">
+      ✓
+    </div>
+  </div>
+
+  <!-- Pending -->
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-title">Pending</div>
+      <div class="kpi-value kpi-value-int" style="color:#D97706;">{{ stats.pending }}</div>
+      <span class="kpi-badge kpi-badge-orange">
+        Pending ({% if stats.total > 0 %}{{ ((stats.pending / stats.total)*100)|round(1) }}%{% else %}0%{% endif %})
+      </span>
+    </div>
+    <div class="kpi-icon-square" style="background:#FFFBEB;color:#D97706;">
+      ⏳
+    </div>
+  </div>
+
+  <!-- Model Accuracy -->
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-title">Model Accuracy</div>
+      <div class="kpi-value" style="color:#2563EB;">
+        {% if best_info %}{{ "%.2f"|format(best_info.accuracy) }}%{% else %}98.37%{% endif %}
+      </div>
+      <span class="kpi-badge kpi-badge-blue">
+        Best Model: {% if best_info %}{{ best_info.model }}{% else %}SVM{% endif %}
+      </span>
+    </div>
+    <div class="kpi-icon-square" style="background:#EFF6FF;color:#2563EB;">
+      🎯
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="dashboard-charts-grid">
+  <!-- Bar Chart -->
+  <div class="chart-card">
+    <div class="chart-title">Complaints by Category</div>
+    <div style="position:relative;height:240px;">
+      <canvas id="barChart" aria-label="Complaints by category bar chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Donut Chart -->
+  <div class="chart-card">
+    <div class="chart-title">Category Distribution</div>
+    <div style="position:relative;height:240px;">
+      <canvas id="doughnutChart" aria-label="Category distribution donut chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Best Model Summary Card -->
+{% if best_info %}
+<div class="best-model-summary-card">
+  <div class="chart-title" style="margin-bottom:8px;">🤖 Best Model Summary</div>
+  <p style="font-size:12.5px;color:var(--txt-muted);margin-bottom:12px;">
+    Linear Support Vector Machine (LinearSVC with Calibrated probabilities) selected by highest test F1-score.
+  </p>
+  <div class="best-model-grid">
+    <div class="model-stat-pill">
+      <div class="model-stat-label">Model Algorithm</div>
+      <div class="model-stat-value" style="font-size:16px;">{{ best_info.model }}</div>
+    </div>
+    <div class="model-stat-pill">
+      <div class="model-stat-label">Test Accuracy</div>
+      <div class="model-stat-value">{{ "%.2f"|format(best_info.accuracy) }}%</div>
+    </div>
+    <div class="model-stat-pill">
+      <div class="model-stat-label">Precision (Weighted)</div>
+      <div class="model-stat-value">{{ "%.2f"|format(best_info.precision) }}%</div>
+    </div>
+    <div class="model-stat-pill">
+      <div class="model-stat-label">F1-Score (Weighted)</div>
+      <div class="model-stat-value">{{ "%.2f"|format(best_info.f1_score) }}%</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+  // All 6 categories strictly defined
+  const ALL_SIX_CATEGORIES = [
+    'Account Issue',
+    'Billing Issue',
+    'Delivery Issue',
+    'Payment Issue',
+    'Service Issue',
+    'Technical Issue'
+  ];
+
+  const RAW_CATEGORY_DATA = {{ stats.by_category | tojson }};
+  
+  // Ensure all 6 categories are represented (with DB count or 0)
+  const labels = ALL_SIX_CATEGORIES.map(cat => cat.replace(' Issue', ''));
+  const values = ALL_SIX_CATEGORIES.map(cat => RAW_CATEGORY_DATA[cat] || 0);
+
+  const CATEGORY_COLORS = {
+    'Account':   '#8B5CF6',
+    'Billing':   '#F59E0B',
+    'Delivery':  '#10B981',
+    'Payment':   '#3B82F6',
+    'Service':   '#64748B',
+    'Technical': '#EF4444'
+  };
+
+  const colors = labels.map(l => CATEGORY_COLORS[l] || '#3B82F6');
+
+  // ── Bar Chart ──────────────────────────────────────────────────────────
+  const barCtx = document.getElementById('barChart');
+  if (barCtx) {
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Complaints',
+          data: values,
+          backgroundColor: colors,
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0F172A',
+            padding: 10,
+            cornerRadius: 6
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#64748B', font: { size: 11, family: 'Plus Jakarta Sans' } },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#64748B', font: { size: 11, family: 'Plus Jakarta Sans' }, precision: 0 },
+            grid: { color: '#F1F5F9' }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Donut Chart ────────────────────────────────────────────────────────
+  const dCtx = document.getElementById('doughnutChart');
+  if (dCtx) {
+    const total = values.reduce((a, b) => a + b, 0);
+    // If no records logged, show equal placeholders or empty slice
+    const chartValues = total > 0 ? values : [1, 1, 1, 1, 1, 1];
+    new Chart(dCtx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: chartValues,
+          backgroundColor: colors,
+          borderColor: '#FFFFFF',
+          borderWidth: 3,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#475569',
+              font: { size: 11, family: 'Plus Jakarta Sans' },
+              padding: 8,
+              usePointStyle: true,
+              generateLabels(chart) {
+                const data = chart.data;
+                return data.labels.map((label, i) => ({
+                  text: `${label}  ${total > 0 ? ((values[i]/total)*100).toFixed(1) : 0}%`,
+                  fillStyle: data.datasets[0].backgroundColor[i],
+                  index: i
+                }));
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#0F172A',
+            padding: 10,
+            cornerRadius: 6,
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${values[ctx.dataIndex]} (${total > 0 ? ((values[ctx.dataIndex]/total)*100).toFixed(1) : 0}%)`
+            }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

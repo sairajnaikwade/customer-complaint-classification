@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="{% block meta_description %}Customer Complaint Classification System - NLP & ML powered automatic complaint routing.{% endblock %}"/>
+  <title>{% block title %}Home{% endblock %} | Customer Complaint Classification System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>"/>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ═══ SIDEBAR (Dark Navy across all pages) ═══════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🤖</div>
+    <div class="brand-text">
+      ComplainAI
+      <span>Customer Complaint Classification</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <span class="nav-label">Navigation</span>
+    <a href="{{ url_for('index') }}"
+       class="nav-item {% if request.endpoint == 'index' %}active{% endif %}"
+       id="nav-home" onclick="closeSidebar()">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+    <a href="{{ url_for('dashboard') }}"
+       class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}"
+       id="nav-dashboard" onclick="closeSidebar()">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a href="{{ url_for('history') }}"
+       class="nav-item {% if request.endpoint in ('history', 'result') %}active{% endif %}"
+       id="nav-history" onclick="closeSidebar()">
+      <span class="nav-icon">📁</span> Previous Complaints
+    </a>
+    <a href="{{ url_for('model_comparison') }}"
+       class="nav-item {% if request.endpoint == 'model_comparison' %}active{% endif %}"
+       id="nav-model" onclick="closeSidebar()">
+      <span class="nav-icon">🔬</span> Model Comparison
+    </a>
+    <a href="{{ url_for('about') }}"
+       class="nav-item {% if request.endpoint == 'about' %}active{% endif %}"
+       id="nav-about" onclick="closeSidebar()">
+      <span class="nav-icon">ℹ️</span> About
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    NLP Project &bull; Sanjivani COE<br/>
+    Kopargaon &bull; 2026–27
+  </div>
+</aside>
+
+<!-- ═══ MAIN CONTENT AREA ═════════════════════════════════════════════════ -->
+<div class="main">
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()" aria-label="Toggle Menu">☰</button>
+      <div>
+        <div class="topbar-title">{% block topbar_title %}Customer Complaint Classification System{% endblock %}</div>
+        <div class="topbar-subtitle">{% block topbar_subtitle %}Powered by NLP &amp; Machine Learning{% endblock %}</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-badge">🎓 B.Tech NLP Project</span>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="content" role="main">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<!-- ═══ BASE JS ══════════════════════════════════════════════════════════ -->
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (overlay) overlay.classList.toggle('active');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (overlay) overlay.classList.remove('active');
+  }
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

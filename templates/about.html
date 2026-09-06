@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+{% block meta_description %}Academic documentation and system overview of the Customer Complaint Classification System.{% endblock %}
+
+{% block topbar_title %}About This Project{% endblock %}
+{% block topbar_subtitle %}Academic documentation and system architecture{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2 class="page-title">ℹ️ About This Project</h2>
+  <p class="page-subtitle">
+    B.Tech NLP Subject Project — Sanjivani College of Engineering, Kopargaon | Academic Year 2026–27
+  </p>
+</div>
+
+<!-- 5-Step System Workflow Diagram (Matching Reference Panel 6) -->
+<div class="workflow-card-white">
+  <div class="white-chart-title">⚙️ System Workflow (NLP Pipeline Architecture)</div>
+  <div class="workflow-steps-row">
+    <!-- Step 1 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">1. Input</div>
+      <div class="step-box-icon">📄</div>
+      <div class="step-box-title">Complaint Text</div>
+      <p style="font-size:11.5px;color:var(--txt-dark-sub);">Customer enters raw text grievance via web portal</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">2. Preprocessing</div>
+      <div class="step-box-icon">🔤</div>
+      <div class="step-box-title">NLP Cleaning</div>
+      <ul class="step-box-list">
+        <li>Tokenization</li>
+        <li>Lowercasing &amp; Contractions</li>
+        <li>Stop-word removal</li>
+        <li>WordNet Lemmatization</li>
+      </ul>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">3. Feature Extraction</div>
+      <div class="step-box-icon">📊</div>
+      <div class="step-box-title">TF-IDF Vectorizer</div>
+      <ul class="step-box-list">
+        <li>(1, 2) N-grams</li>
+        <li>5,000 max features</li>
+        <li>Sublinear TF scaling</li>
+      </ul>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">4. Classification</div>
+      <div class="step-box-icon">🤖</div>
+      <div class="step-box-title">ML Classifier</div>
+      <ul class="step-box-list">
+        <li>Linear SVM (Best Model)</li>
+        <li>Logistic Regression</li>
+        <li>Multinomial Naive Bayes</li>
+      </ul>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">5. Output</div>
+      <div class="step-box-icon">🎯</div>
+      <div class="step-box-title">Routing &amp; Storage</div>
+      <ul class="step-box-list">
+        <li>Predicted Category</li>
+        <li>Calibrated Confidence %</li>
+        <li>Department Routing</li>
+        <li>SQLite Audit Logging</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="workflow-example-box">
+    <div>
+      <strong>Example:</strong>
+      <span style="color:var(--txt-dark-sub);font-style:italic;">"My payment was deducted but the order was not confirmed."</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="background:#EFF6FF;color:#2563EB;padding:4px 10px;border-radius:4px;font-weight:700;">
+        Output: Payment Issue (98.4%)
+      </span>
+      <span style="background:#FEF3C7;color:#D97706;padding:4px 10px;border-radius:4px;font-weight:700;">
+        Routed to: 💳 Finance Team
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- 2-Column Academic Detail Section -->
+<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;">
+  <div>
+    <!-- Project Overview -->
+    <div class="white-eval-card" style="margin-bottom:20px;">
+      <div class="white-chart-title">📌 Project Overview</div>
+      <p style="font-size:13px;color:var(--txt-dark-sub);line-height:1.75;margin-bottom:12px;">
+        The <strong style="color:var(--txt-dark-main);">Customer Complaint Classification System</strong> is an end-to-end
+        Natural Language Processing and Machine Learning solution designed to automatically categorize customer grievances
+        into functional categories and route them to corresponding departments.
+      </p>
+      <p style="font-size:13px;color:var(--txt-dark-sub);line-height:1.75;">
+        The system reduces manual triage latency, optimizes support team workloads, and provides transparent explainability for academic project evaluation.
+      </p>
+    </div>
+
+    <!-- Preprocessing Details -->
+    <div class="white-eval-card" style="margin-bottom:20px;">
+      <div class="white-chart-title">🔬 NLP Preprocessing Pipeline</div>
+      <ol style="font-size:13px;color:var(--txt-dark-sub);line-height:2.1;padding-left:18px;">
+        <li><strong style="color:var(--txt-dark-main);">Lowercase Conversion</strong> — Standardizes text case.</li>
+        <li><strong style="color:var(--txt-dark-main);">Contraction Expansion</strong> — Expands phrases like <code>wasn't → was not</code>.</li>
+        <li><strong style="color:var(--txt-dark-main);">Noise &amp; Symbol Removal</strong> — Strips URLs, emails, special punctuation, and digits.</li>
+        <li><strong style="color:var(--txt-dark-main);">Tokenization</strong> — Segments text into individual lexical tokens.</li>
+        <li><strong style="color:var(--txt-dark-main);">Stop-word Filtering</strong> — Removes high-frequency, low-information functional words.</li>
+        <li><strong style="color:var(--txt-dark-main);">Lemmatization</strong> — Reduces words to canonical dictionary forms via WordNet (e.g. <code>crashing → crash</code>).</li>
+      </ol>
+    </div>
+
+    <!-- TF-IDF Parameters -->
+    <div class="white-eval-card">
+      <div class="white-chart-title">📊 TF-IDF Feature Extraction</div>
+      <p style="font-size:13px;color:var(--txt-dark-sub);line-height:1.7;margin-bottom:14px;">
+        Term Frequency–Inverse Document Frequency transforms cleaned text into sparse n-gram feature vectors.
+      </p>
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px;font-size:12.5px;">
+        <p style="color:var(--clr-primary);font-weight:700;margin-bottom:6px;">Parameters Used:</p>
+        <ul style="color:var(--txt-dark-sub);padding-left:16px;line-height:2;">
+          <li><code>max_features = 5000</code></li>
+          <li><code>ngram_range = (1, 2)</code></li>
+          <li><code>sublinear_tf = True</code></li>
+          <li><code>norm = l2</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <!-- Categories -->
+    <div class="white-eval-card" style="margin-bottom:20px;">
+      <div class="white-chart-title">🗂️ Complaint Categories</div>
+      {% set categories = [
+        ('💳','Payment Issue',   'Finance / Payments Team', '#2563EB', '#EFF6FF'),
+        ('🧾','Billing Issue',   'Billing Team',            '#D97706', '#FEF3C7'),
+        ('🔧','Technical Issue', 'Technical Support',       '#DC2626', '#FEE2E2'),
+        ('📦','Delivery Issue',  'Logistics / Delivery',    '#059669', '#ECFDF5'),
+        ('👤','Account Issue',   'Account Support',         '#7C3AED', '#F3E8FF'),
+        ('🎧','Service Issue',   'Customer Support',        '#DB2777', '#FCE7F3')
+      ] %}
+      {% for icon, name, dept, color, bg in categories %}
+      <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #F1F5F9;">
+        <span style="font-size:20px;width:34px;height:34px;border-radius:6px;background:{{ bg }};display:flex;align-items:center;justify-content:center;">{{ icon }}</span>
+        <div style="flex:1;">
+          <p style="font-size:13px;font-weight:700;color:{{ color }};">{{ name }}</p>
+          <p style="font-size:11.5px;color:var(--txt-dark-muted);">→ {{ dept }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="white-eval-card">
+      <div class="white-chart-title">⚙️ Technology Stack</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {% set techs = [
+          ('Python 3.13', '#2563EB'),
+          ('Flask 3.1', '#059669'),
+          ('scikit-learn 1.9', '#D97706'),
+          ('NLTK 3.10', '#7C3AED'),
+          ('Pandas & NumPy', '#0284C7'),
+          ('SQLite Database', '#475569'),
+          ('Chart.js 4.4', '#DC2626'),
+          ('HTML5 / CSS3 / Vanilla JS', '#EA580C')
+        ] %}
+        {% for name, col in techs %}
+        <span style="background:#F8FAFC;border:1px solid #E2E8F0;color:{{ col }};font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;">
+          {{ name }}
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

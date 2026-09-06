@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Model Comparison{% endblock %}
+{% block meta_description %}Compare Naive Bayes, Logistic Regression and SVM model performance metrics and confusion matrix.{% endblock %}
+
+{% block topbar_title %}Model Comparison{% endblock %}
+{% block topbar_subtitle %}Performance comparison of machine learning models trained on complaint data{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2 class="page-title">🔬 Model Comparison</h2>
+  <p class="page-subtitle">Performance comparison of different machine learning models</p>
+</div>
+
+{% if error %}
+<div class="alert alert-error" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;padding:14px 20px;border-radius:8px;">
+  ⚠️ {{ error }}
+</div>
+{% else %}
+
+<!-- Model Evaluation 2-Column Grid (Matching Reference Panel 5) -->
+<div class="model-eval-grid">
+  <!-- Left Card: Comparison Table -->
+  <div class="white-eval-card">
+    <div class="white-chart-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>📋 Model Performance</span>
+      <span style="font-size:11px;font-weight:700;color:#059669;background:#ECFDF5;padding:3px 8px;border-radius:4px;">
+        Stratified 80/20 Split
+      </span>
+    </div>
+    
+    <div style="overflow-x:auto;">
+      <table class="saas-table" aria-label="Model evaluation table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Accuracy</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1-Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table %}
+          <tr style="{% if row.is_best %}background:#EFF6FF;font-weight:600;{% endif %}">
+            <td>
+              <strong>{{ row.model }}</strong>
+              {% if row.is_best %}
+              <span style="margin-left:6px;font-size:10px;background:#2563EB;color:#FFF;padding:2px 6px;border-radius:4px;">
+                BEST
+              </span>
+              {% endif %}
+            </td>
+            <td>{{ "%.2f"|format(row.accuracy) }}%</td>
+            <td>{{ "%.2f"|format(row.precision) }}%</td>
+            <td>{{ "%.2f"|format(row.recall) }}%</td>
+            <td style="{% if row.is_best %}color:#2563EB;font-weight:800;{% endif %}">
+              {{ "%.2f"|format(row.f1_score) }}%
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="white-chart-title" style="font-size:13px;margin-bottom:10px;">Model Radar Comparison</div>
+      <div style="position:relative;height:220px;">
+        <canvas id="radarChart" aria-label="Radar comparison chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Card: Confusion Matrix 6x6 Grid -->
+  <div class="white-eval-card">
+    <div class="white-chart-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span id="cmTitle">Confusion Matrix (SVM)</span>
+      <select id="cmModelSelect" class="select-filter-white" style="font-size:12px;padding:4px 8px;" onchange="loadCM(this.value)">
+        {% for model_name in all_models %}
+        <option value="{{ model_name }}"{% if model_name == best.model %} selected{% endif %}>{{ model_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div id="cmContainer" class="cm-table-container">
+      {% set cm  = cm_data.confusion_matrix %}
+      {% set cls = cm_data.classes %}
+      
+      <table class="cm-matrix-grid" aria-label="Confusion Matrix">
+        <thead>
+          <tr>
+            <th style="width:75px;text-align:right;padding-right:6px;">Actual ↓</th>
+            {% for label in cls %}
+            <th title="{{ label }}">{{ label.replace(' Issue','')[:4] }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in cm|enumerate %}
+          <tr>
+            <td class="cm-row-header" title="{{ cls[i] }}">
+              {{ cls[i].replace(' Issue','')[:4] }}
+            </td>
+            {% for j, val in row|enumerate %}
+            <td class="cm-cell-val {% if i == j and val > 0 %}cm-cell-correct{% elif val > 0 %}cm-cell-error{% else %}cm-cell-zero{% endif %}"
+                title="Actual: {{ cls[i] }} | Predicted: {{ cls[j] }} ({{ val }} samples)">
+              {{ val }}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div style="font-size:11px;color:var(--txt-dark-muted);text-align:center;margin-top:4px;">Predicted →</div>
+    </div>
+
+    <div class="cm-legend">
+      <div class="cm-legend-item">
+        <span class="cm-dot-blue"></span> Correct predictions
+      </div>
+      <div class="cm-legend-item">
+        <span class="cm-dot-red"></span> Misclassifications
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Workflow Diagram Card (Matching Reference Panel 6) -->
+<div class="workflow-card-white">
+  <div class="white-chart-title">⚙️ System Workflow (How It Works)</div>
+  <div class="workflow-steps-row">
+    <!-- Step 1 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">1. Input</div>
+      <div class="step-box-icon">📄</div>
+      <div class="step-box-title">Complaint Text</div>
+      <p style="font-size:11px;color:var(--txt-dark-sub);">Customer enters unstructured text grievance</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">2. Preprocessing</div>
+      <div class="step-box-icon">🔤</div>
+      <div class="step-box-title">NLP Cleaning</div>
+      <ul class="step-box-list">
+        <li>Tokenization</li>
+        <li>Lowercasing</li>
+        <li>Stopwords removal</li>
+        <li>Lemmatization</li>
+      </ul>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">3. Feature Extraction</div>
+      <div class="step-box-icon">📊</div>
+      <div class="step-box-title">TF-IDF Vectorizer</div>
+      <ul class="step-box-list">
+        <li>(1, 2) N-grams</li>
+        <li>5,000 max features</li>
+        <li>Sublinear TF scaling</li>
+      </ul>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">4. Classification</div>
+      <div class="step-box-icon">🤖</div>
+      <div class="step-box-title">ML Model</div>
+      <ul class="step-box-list">
+        <li>Linear SVM (Best)</li>
+        <li>Logistic Regression</li>
+        <li>Multinomial NB</li>
+      </ul>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="workflow-step-box">
+      <div class="step-num-badge">5. Output</div>
+      <div class="step-box-icon">🎯</div>
+      <div class="step-box-title">Resolution &amp; Routing</div>
+      <ul class="step-box-list">
+        <li>Predicted Category</li>
+        <li>Confidence %</li>
+        <li>Department Routing</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="workflow-example-box">
+    <div>
+      <strong>Example:</strong>
+      <span style="color:var(--txt-dark-sub);font-style:italic;">"My payment was deducted but the order was not confirmed."</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="background:#EFF6FF;color:#2563EB;padding:4px 10px;border-radius:4px;font-weight:700;">
+        Output: Payment Issue (98.4%)
+      </span>
+      <span style="background:#FEF3C7;color:#D97706;padding:4px 10px;border-radius:4px;font-weight:700;">
+        Routed to: 💳 Finance Team
+      </span>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // ── Radar Chart ────────────────────────────────────────────────────────
+  const RADAR_DATA = {{ table | tojson }};
+  const radarCtx = document.getElementById('radarChart');
+  if (radarCtx && RADAR_DATA.length) {
+    const COLORS = ['#3B82F6', '#10B981', '#F59E0B'];
+    new Chart(radarCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
+        datasets: RADAR_DATA.map((row, i) => ({
+          label: row.model,
+          data: [row.accuracy, row.precision, row.recall, row.f1_score],
+          fill: true,
+          backgroundColor: COLORS[i % COLORS.length] + '20',
+          borderColor:     COLORS[i % COLORS.length],
+          pointBackgroundColor: COLORS[i % COLORS.length],
+          pointRadius: 3,
+          borderWidth: 2
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 88,
+            max: 100,
+            ticks: { display: false },
+            grid: { color: '#E2E8F0' },
+            pointLabels: { color: '#64748B', font: { size: 10, family: 'Plus Jakarta Sans' } }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#475569', font: { size: 10, family: 'Plus Jakarta Sans' }, boxWidth: 10 }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Dynamic Confusion Matrix Fetch ─────────────────────────────────────
+  async function loadCM(modelName) {
+    try {
+      const resp = await fetch(`/api/confusion-matrix/${encodeURIComponent(modelName)}`);
+      const data = await resp.json();
+      if (data.error) { alert(data.error); return; }
+
+      document.getElementById('cmTitle').textContent = `Confusion Matrix (${modelName})`;
+      const container = document.getElementById('cmContainer');
+      const { classes, confusion_matrix } = data;
+
+      let html = `<table class="cm-matrix-grid" aria-label="Confusion Matrix">
+        <thead><tr>
+          <th style="width:75px;text-align:right;padding-right:6px;">Actual ↓</th>`;
+      classes.forEach(c => {
+        html += `<th title="${c}">${c.replace(' Issue','').substring(0, 4)}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      confusion_matrix.forEach((row, i) => {
+        html += `<tr><td class="cm-row-header" title="${classes[i]}">${classes[i].replace(' Issue','').substring(0, 4)}</td>`;
+        row.forEach((val, j) => {
+          let cellClass = 'cm-cell-zero';
+          if (i === j && val > 0) cellClass = 'cm-cell-correct';
+          else if (val > 0) cellClass = 'cm-cell-error';
+
+          html += `<td class="cm-cell-val ${cellClass}" title="Actual: ${classes[i]} | Predicted: ${classes[j]} (${val} samples)">${val}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += `</tbody></table>
+        <div style="font-size:11px;color:var(--txt-dark-muted);text-align:center;margin-top:4px;">Predicted →</div>`;
+      container.innerHTML = html;
+    } catch (e) {
+      alert('Failed to load confusion matrix for ' + modelName);
+    }
+  }
+</script>
+{% endblock %}

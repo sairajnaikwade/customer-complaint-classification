@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Result{% endblock %}
+{% block meta_description %}Classification result for your customer complaint.{% endblock %}
+
+{% block topbar_title %}Classification Result{% endblock %}
+{% block topbar_subtitle %}Complaint has been processed and routed{% endblock %}
+
+{% block content %}
+<!-- Success Banner -->
+<div class="result-success-banner">
+  <span>✓</span>
+  <span>Complaint Classified Successfully!</span>
+</div>
+
+<!-- White Result Card (Matching Reference Panel 2) -->
+<div class="result-card-main">
+  <div class="result-top-grid">
+    <!-- Predicted Category -->
+    <div class="category-output-box">
+      <div class="result-section-label">Predicted Category</div>
+      <div class="category-output-header">
+        {% set bg_map = {
+          'Payment Issue': '#EFF6FF',
+          'Billing Issue': '#FEF3C7',
+          'Technical Issue': '#FEE2E2',
+          'Delivery Issue': '#ECFDF5',
+          'Account Issue': '#F3E8FF',
+          'Service Issue': '#FCE7F3'
+        } %}
+        <div class="category-icon-square" style="background:{{ bg_map.get(record.predicted_category, '#EFF6FF') }};color:{{ dept_info.get('color','#2563EB') }};">
+          {{ dept_info.get('icon', '💳') }}
+        </div>
+        <div>
+          <div class="category-output-title">{{ record.predicted_category }}</div>
+        </div>
+      </div>
+      <p class="category-output-desc">
+        {{ dept_info.get('description', 'This complaint has been analyzed and classified into this category.') }}
+      </p>
+    </div>
+
+    <!-- Confidence Score -->
+    <div class="confidence-gauge-box">
+      <div class="result-section-label">Confidence Score</div>
+      {% if record.model_score %}
+      <div class="confidence-ring-container">
+        <svg class="confidence-ring-svg" width="90" height="90" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#E2E8F0" stroke-width="8"/>
+          <circle cx="50" cy="50" r="40" fill="none"
+            stroke="#2563EB" stroke-width="8"
+            stroke-linecap="round"
+            stroke-dasharray="251.3"
+            stroke-dashoffset="{{ ((100 - record.model_score) / 100 * 251.3)|round(2) }}"
+            id="confCircle"/>
+        </svg>
+        <div class="confidence-percentage-text">{{ record.model_score }}%</div>
+      </div>
+      <div class="confidence-sub-text">Calibrated Probability</div>
+      {% else %}
+      <p style="color:var(--txt-muted);font-size:14px;">Score not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Your Complaint -->
+  <div class="result-section-label">Your Complaint</div>
+  <div class="complaint-quote-box">
+    "{{ record.complaint_text }}"
+  </div>
+
+  <!-- Routed To -->
+  <div class="result-section-label">Routed To</div>
+  <div class="routed-box">
+    <div class="routed-icon">
+      {{ dept_info.get('icon', '🏢') }}
+    </div>
+    <div>
+      <div class="routed-title">{{ dept_info.get('department', 'General Support') }}</div>
+      <div class="routed-desc">
+        This complaint has been routed to the {{ dept_info.get('department', 'General Support') }} for further action.
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="result-actions">
+    <a href="{{ url_for('index') }}" class="btn-pill-blue" id="classifyAnotherBtn">
+      ↻ Classify Another
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="btn-pill-outline" id="viewDashboardBtn">
+      📊 View Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- NLP Processing Breakdown Card -->
+<div class="card" style="max-width:820px;margin:0 auto 24px;">
+  <div class="card-title">🔬 NLP Processing Breakdown</div>
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:18px;font-size:12.5px;">
+    <div>
+      <p style="color:var(--txt-muted);margin-bottom:6px;font-weight:600;">📝 Cleaned &amp; Normalized Text:</p>
+      <p style="background:#F8FAFC;border:1px solid var(--clr-border);padding:10px 14px;border-radius:6px;color:var(--clr-primary);font-family:var(--font-mono);font-size:12px;word-break:break-word;">
+        {{ record.clean_text or '—' }}
+      </p>
+    </div>
+    <div>
+      <p style="color:var(--txt-muted);margin-bottom:6px;font-weight:600;">🗂️ Audit Record Info:</p>
+      <div style="background:#F8FAFC;border:1px solid var(--clr-border);padding:10px 14px;border-radius:6px;font-size:12px;line-height:1.7;">
+        <div><strong>Complaint ID:</strong> #{{ record.id }}</div>
+        <div><strong>Status:</strong>
+          <span style="display:inline-block;padding:1px 8px;border-radius:4px;font-size:11px;font-weight:700;background:{% if record.status == 'Resolved' %}#ECFDF5;color:#059669;{% else %}#FFFBEB;color:#D97706;{% endif %}">
+            {{ record.status }}
+          </span>
+        </div>
+        <div><strong>Logged At:</strong> {{ record.created_at }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  window.addEventListener('load', () => {
+    const circle = document.getElementById('confCircle');
+    if (circle) {
+      const targetOffset = parseFloat(circle.getAttribute('stroke-dashoffset'));
+      circle.style.strokeDashoffset = 251.3;
+      setTimeout(() => {
+        circle.style.transition = 'stroke-dashoffset 0.8s ease-out';
+        circle.style.strokeDashoffset = targetOffset;
+      }, 200);
+    }
+  });
+</script>
+{% endblock %}

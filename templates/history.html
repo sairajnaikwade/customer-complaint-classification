@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Previous Complaints{% endblock %}
+{% block meta_description %}View and manage all classified customer complaint history.{% endblock %}
+
+{% block topbar_title %}Previous Complaints{% endblock %}
+{% block topbar_subtitle %}View all classified complaints and their details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2 class="page-title">📁 Previous Complaints</h2>
+  <p class="page-subtitle">View all classified complaints with search, filter, and status management.</p>
+</div>
+
+<!-- White Filter Bar (Matching Reference Panel 4) -->
+<form method="GET" action="{{ url_for('history') }}" id="filterForm">
+  <div class="filter-container-white">
+    <input
+      type="search"
+      class="search-input-white"
+      name="search"
+      id="searchInput"
+      placeholder="🔍 Search complaints…"
+      value="{{ search_query }}"
+      aria-label="Search complaints"
+    />
+    <select name="category" class="select-filter-white" id="categoryFilter" onchange="this.form.submit()" aria-label="Filter by category">
+      <option value="All"{% if selected_category == 'All' %} selected{% endif %}>All Categories</option>
+      {% for cat in categories %}
+      <option value="{{ cat }}"{% if selected_category == cat %} selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <select name="status" class="select-filter-white" id="statusFilter" onchange="this.form.submit()" aria-label="Filter by status">
+      <option value="All"{% if selected_status == 'All' %} selected{% endif %}>All Status</option>
+      <option value="Pending"{% if selected_status == 'Pending' %} selected{% endif %}>Pending</option>
+      <option value="Resolved"{% if selected_status == 'Resolved' %} selected{% endif %}>Resolved</option>
+    </select>
+    <button type="submit" class="btn-search-white">Search</button>
+    <a href="{{ url_for('history') }}" class="btn-clear-white">Clear</a>
+  </div>
+</form>
+
+<!-- White Complaints Table Card -->
+<div class="history-table-card">
+  {% if complaints %}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <p style="font-size:12px;color:var(--txt-dark-muted);">
+      Showing {{ complaints|length }} record{% if complaints|length != 1 %}s{% endif %}
+      {% if search_query %} matching "<strong>{{ search_query }}</strong>"{% endif %}
+    </p>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="saas-table" id="complaintsTable" aria-label="Complaints history table">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Complaint Text</th>
+          <th>Predicted Category</th>
+          <th>Confidence</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set cat_icons = {
+          'Payment Issue':   ('💳', '#EFF6FF', '#2563EB'),
+          'Billing Issue':   ('🧾', '#FEF3C7', '#D97706'),
+          'Technical Issue': ('🔧', '#FEE2E2', '#DC2626'),
+          'Delivery Issue':  ('📦', '#ECFDF5', '#059669'),
+          'Account Issue':   ('👤', '#F3E8FF', '#7C3AED'),
+          'Service Issue':   ('🎧', '#FCE7F3', '#DB2777')
+        } %}
+        {% for c in complaints %}
+        <tr id="row-{{ c.id }}">
+          <td style="color:var(--txt-dark-muted);font-weight:600;">{{ c.id }}</td>
+          <td style="max-width:320px;">
+            <div title="{{ c.complaint_text }}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;">
+              {{ c.complaint_text }}
+            </div>
+          </td>
+          <td>
+            {% set icon, bg, clr = cat_icons.get(c.predicted_category, ('📁', '#F1F5F9', '#475569')) %}
+            <span class="category-tag" style="background:{{ bg }};color:{{ clr }};">
+              {{ icon }} {{ c.predicted_category }}
+            </span>
+          </td>
+          <td>
+            {% if c.model_score %}
+            <span style="font-weight:700;color:var(--txt-dark-main);font-size:12.5px;">{{ c.model_score }}%</span>
+            {% else %}—{% endif %}
+          </td>
+          <td style="font-size:12px;color:var(--txt-dark-muted);white-space:nowrap;">
+            {{ c.created_at[:10] if c.created_at else '—' }}
+          </td>
+          <td>
+            {% if c.status == 'Resolved' %}
+            <span id="status-badge-{{ c.id }}" class="status-badge-resolved">Resolved</span>
+            {% else %}
+            <span id="status-badge-{{ c.id }}" class="status-badge-pending">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if c.status == 'Pending' %}
+            <button class="btn-table-action btn-resolve"
+              onclick="updateStatus({{ c.id }}, 'Resolved')"
+              id="btn-{{ c.id }}"
+              aria-label="Mark complaint {{ c.id }} as resolved">
+              ✓ Resolve
+            </button>
+            {% else %}
+            <button class="btn-table-action btn-reopen"
+              onclick="updateStatus({{ c.id }}, 'Pending')"
+              id="btn-{{ c.id }}"
+              aria-label="Reopen complaint {{ c.id }}">
+              ↩ Reopen
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:48px;">
+    <p style="font-size:40px;margin-bottom:12px;">📭</p>
+    <p style="font-size:15px;color:var(--txt-dark-sub);">No complaints found matching your criteria.</p>
+    {% if search_query or selected_category != 'All' or selected_status != 'All' %}
+    <a href="{{ url_for('history') }}" class="btn-clear-white" style="display:inline-block;margin-top:14px;">Clear Filters</a>
+    {% else %}
+    <a href="{{ url_for('index') }}" class="btn-pill-blue" style="margin-top:14px;">🔍 Classify First Complaint</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+<script>
+  async function updateStatus(id, newStatus) {
+    const btn = document.getElementById(`btn-${id}`);
+    const badge = document.getElementById(`status-badge-${id}`);
+    if (!btn) return;
+    
+    btn.disabled = true;
+    try {
+      const resp = await fetch(`/api/history/${id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        if (newStatus === 'Resolved') {
+          badge.className = 'status-badge-resolved';
+          badge.textContent = 'Resolved';
+          btn.className = 'btn-table-action btn-reopen';
+          btn.textContent = '↩ Reopen';
+          btn.onclick = () => updateStatus(id, 'Pending');
+        } else {
+          badge.className = 'status-badge-pending';
+          badge.textContent = 'Pending';
+          btn.className = 'btn-table-action btn-resolve';
+          btn.textContent = '✓ Resolve';
+          btn.onclick = () => updateStatus(id, 'Resolved');
+        }
+      } else {
+        alert(data.error || 'Failed to update status.');
+      }
+    } catch (err) {
+      alert('Network error while updating status.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+{% endblock %}

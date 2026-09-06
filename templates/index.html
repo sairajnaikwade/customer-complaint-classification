@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block meta_description %}Classify customer complaints automatically using NLP and Machine Learning.{% endblock %}
+
+{% block topbar_title %}Customer Complaint Classification System{% endblock %}
+{% block topbar_subtitle %}Powered by NLP &amp; Machine Learning{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <h1>Customer Complaint<br/><span>Classification System</span></h1>
+  <p class="hero-sub">
+    Use NLP and Machine Learning to automatically classify customer complaints
+    into the right category and route them to the correct department.
+  </p>
+</section>
+
+<!-- Feature Highlights (4 Items) -->
+<div class="features-bar">
+  <div class="feature-item">
+    <div class="feature-icon">⚡</div>
+    <div class="feature-title">Fast Classification</div>
+    <div class="feature-desc">Instant results powered by Linear SVM</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🎯</div>
+    <div class="feature-title">Accurate Predictions</div>
+    <div class="feature-desc">98.37% Accuracy on test data</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🏢</div>
+    <div class="feature-title">Department Routing</div>
+    <div class="feature-desc">Auto-routed to the right team</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🧠</div>
+    <div class="feature-title">NLP Pipeline</div>
+    <div class="feature-desc">Tokenization → TF-IDF → SVM</div>
+  </div>
+</div>
+
+<!-- Error alert (if any) -->
+{% if error %}
+<div style="max-width:820px;margin:0 auto 16px;padding:12px 16px;background:var(--clr-danger-bg);border:1px solid var(--clr-danger-border);color:var(--clr-danger);border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;" role="alert">
+  ⚠️ {{ error }}
+</div>
+{% endif %}
+
+<!-- Complaint Input Box -->
+<div class="complaint-box-card">
+  <h2 class="complaint-box-title">Enter Your Complaint</h2>
+
+  <form id="complaintForm" action="{{ url_for('api_predict') }}" method="POST" novalidate>
+    <div class="complaint-textarea-wrapper">
+      <textarea
+        id="complaintInput"
+        class="complaint-textarea"
+        name="complaint"
+        placeholder="Enter your customer complaint here… e.g. 'My payment was deducted but the order was not confirmed.'"
+        maxlength="2000"
+        rows="4"
+        aria-label="Complaint text input"
+        required
+      ></textarea>
+      <div class="char-counter"><span id="charCount">0</span> / 2000</div>
+    </div>
+
+    <button type="submit" class="btn-classify-main" id="classifyBtn" aria-label="Classify Complaint">
+      🔍 Classify Complaint
+    </button>
+  </form>
+
+  <div class="examples-section">
+    <p class="examples-label">Try an example:</p>
+    <div class="example-chips" role="group" aria-label="Example complaints">
+      <button type="button" class="example-chip" onclick="setExample('My payment was deducted but the order was not confirmed.')">
+        💳 Payment deducted
+      </button>
+      <button type="button" class="example-chip" onclick="setExample('My order has not arrived yet even though the expected delivery date was yesterday.')">
+        📦 Order not arrived
+      </button>
+      <button type="button" class="example-chip" onclick="setExample('The application keeps crashing whenever I try to open it.')">
+        🔧 App keeps crashing
+      </button>
+      <button type="button" class="example-chip" onclick="setExample('I cannot login to my account and password reset link is not working.')">
+        🔐 Cannot login
+      </button>
+      <button type="button" class="example-chip" onclick="setExample('Customer support is not responding to my emails.')">
+        🎧 No support response
+      </button>
+      <button type="button" class="example-chip" onclick="setExample('My card was charged twice for the same order.')">
+        🧾 Double charged
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+  const textarea    = document.getElementById('complaintInput');
+  const charCount   = document.getElementById('charCount');
+  const form        = document.getElementById('complaintForm');
+  const classifyBtn = document.getElementById('classifyBtn');
+
+  if (textarea && charCount) {
+    textarea.addEventListener('input', () => {
+      charCount.textContent = textarea.value.length;
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      const val = textarea.value.trim();
+      if (!val) {
+        e.preventDefault();
+        alert('Please enter a complaint before submitting.');
+        return;
+      }
+      if (val.length < 5) {
+        e.preventDefault();
+        alert('Complaint is too short. Please provide more detail.');
+        return;
+      }
+      classifyBtn.disabled = true;
+      classifyBtn.textContent = '⏳ Classifying…';
+    });
+  }
+
+  function setExample(text) {
+    if (textarea && charCount) {
+      textarea.value = text;
+      charCount.textContent = text.length;
+      textarea.focus();
+    }
+  }
+</script>
+{% endblock %}

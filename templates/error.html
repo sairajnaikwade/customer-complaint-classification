@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Error {{ code }}{% endblock %}
+{% block topbar_title %}Error {{ code }}{% endblock %}
+{% block topbar_subtitle %}Something went wrong{% endblock %}
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;text-align:center;">
+  <div style="font-size:64px;margin-bottom:16px;">
+    {% if code == 404 %}🔍{% else %}⚠️{% endif %}
+  </div>
+  <h1 style="font-size:42px;font-weight:800;color:var(--clr-primary-light);margin-bottom:8px;">{{ code }}</h1>
+  <p style="font-size:15px;color:var(--txt-muted);margin-bottom:24px;">{{ message }}</p>
+  <div style="display:flex;gap:12px;">
+    <a href="{{ url_for('index') }}" class="btn-pill-blue">🏠 Go Home</a>
+    <a href="javascript:history.back()" class="btn-pill-outline">← Go Back</a>
+  </div>
+</div>
+{% endblock %}
