@@ -311,6 +311,5 @@ Access the application in your browser at: **`http://127.0.0.1:5000`**
 - **Institution**: Sanjivani College of Engineering, Kopargaon
 - **Department**: Department of Computer Engineering
 - **Academic Year**: 2026–27
-- **Author**: Sairaj Naikwade
 
 
