@@ -1,83 +1,132 @@
-# 🏦 Customer Complaint Classification System
+# 🏦 Customer Complaint Classification & Department Routing System
 ### Academic B.Tech Project-Based Learning (NLP PBL) — Academic Year 2026–27
-**Sanjivani College of Engineering, Kopargaon**
+**Department of Computer Engineering, Sanjivani College of Engineering, Kopargaon**
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Flask 3.1+](https://img.shields.io/badge/Flask-3.1%2B-green.svg)](https://flask.palletsprojects.com/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6%2B-orange.svg)](https://scikit-learn.org/)
-[![NLTK](https://img.shields.io/badge/NLTK-3.9%2B-yellow.svg)](https://www.nltk.org/)
-[![Tests Passing](https://img.shields.io/badge/Tests-47%2F47%20Passed-brightgreen.svg)](tests/)
-
----
-
-## 📌 1. Project Overview
-
-The **Customer Complaint Classification System** is an end-to-end Natural Language Processing (NLP) and Machine Learning (ML) solution designed to automatically categorize unstructured customer grievances into functional categories and route them to corresponding departments.
-
-The system features:
-- **Clean Academic Light-Theme Web Interface** with a dark navy sidebar across all pages.
-- **Automated Text Classification & Department Routing** using Linear SVM.
-- **Calibrated Prediction Confidence Scores**.
-- **Interactive Analytics Dashboard** displaying complaint distribution across all 6 categories with Chart.js.
-- **Audit & History Log** with real-time search, status filtering, and resolution management.
-- **Model Comparison Suite** with radar charts and a full 6×6 confusion matrix.
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask 3.1](https://img.shields.io/badge/Flask-3.1-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![scikit-learn 1.6+](https://img.shields.io/badge/scikit--learn-1.6%2B-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![NLTK 3.9+](https://img.shields.io/badge/NLTK-3.9%2B-154f5b?style=flat-square)](https://www.nltk.org/)
+[![Chart.js 4.4](https://img.shields.io/badge/Chart.js-4.4-FF6384?style=flat-square&logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
+[![Tests Passing](https://img.shields.io/badge/Tests-47%2F47%20Passed-10B981?style=flat-square&logo=pytest&logoColor=white)](tests/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 ---
 
-## 🗂️ 2. Complaint Categories & Department Routing
+## 📌 1. Executive Summary
 
-The system supports **6 distinct complaint categories**:
+The **Customer Complaint Classification System** is an end-to-end Natural Language Processing (NLP) and Machine Learning (ML) platform designed to automate the triage and routing of unstructured customer grievances. 
 
-| # | Category | Description | Routed Department |
-|---|:---|:---|:---|
-| 1 | 💳 **Payment Issue** | Failed transactions, double charges, payment gateway timeouts | Finance / Payments Team |
-| 2 | 🧾 **Billing Issue** | Invoice discrepancies, unexpected subscription fees, overbilling | Billing Department |
-| 3 | 🔧 **Technical Issue** | Application crashes, server 500 errors, bugs, API failures | Technical Support / IT |
-| 4 | 📦 **Delivery Issue** | Delayed shipments, damaged parcels, tracking failures | Logistics / Delivery Team |
-| 5 | 👤 **Account Issue** | Login failures, 2FA verification issues, locked profiles | Account & Security Team |
-| 6 | 🎧 **Service Issue** | Rude staff behavior, unhelpful representatives, delayed response | Customer Support / Escalations |
+Manual complaint triage in enterprise systems suffers from high latency, human error, and inconsistent routing. This system applies a rigorous text preprocessing pipeline, sublinear TF-IDF vectorization, and a probability-calibrated **Linear Support Vector Machine (LinearSVC)** classifier to achieve **98.37% test accuracy** across **6 operational categories**, automatically directing grievances to their designated departments.
 
 ---
 
-## 🔬 3. NLP Preprocessing Pipeline
+## 🏛️ 2. System Architecture
 
-Every incoming complaint undergoes a rigorous 6-step NLP cleaning and normalization pipeline:
+```mermaid
+flowchart TD
+    subgraph UI["1. User & Client Interface (Light Academic Theme)"]
+        A1["📄 Home & Input Portal<br/>(Live Char Counter / Example Chips)"]
+        A2["📊 Analytics Dashboard<br/>(KPI Cards & Chart.js Visualizations)"]
+        A3["📁 Complaint History Table<br/>(Search, Filter & AJAX Status Toggle)"]
+        A4["🔬 Model Comparison & 6x6 CM<br/>(Radar Charts & Metric Tables)"]
+    end
 
-1. **Lowercase Conversion**: Standardizes text case.
-2. **Contraction Expansion**: Normalizes abbreviations (e.g., `wasn't` → `was not`, `can't` → `cannot`).
-3. **Noise & Punctuation Removal**: Removes URLs, email addresses, non-alphabetic symbols, and standalone digits.
-4. **Tokenization**: Segments text into individual lexical tokens using NLTK.
-5. **Stop-Word Removal**: Filters high-frequency, non-discriminative English stop-words.
-6. **WordNet Lemmatization**: Converts inflected word forms to canonical dictionary lemmas (e.g., `crashing` → `crash`, `deducted` → `deduct`).
+    subgraph API["2. Application Controller Layer (Flask 3.1)"]
+        B1["App Router & REST API (`app.py`)"]
+        B2["Input Validation & Sanitization"]
+        B3["Error Handling (400 / 404 / 500)"]
+    end
+
+    subgraph NLP["3. NLP & Feature Engineering Pipeline (`src/`)"]
+        C1["Raw Text Normalization<br/>(Lowercasing, Contraction Expansion)"]
+        C2["Noise Removal<br/>(URLs, Emails, Special Punctuation, Digits)"]
+        C3["NLTK Tokenization & Stopwords Filtering"]
+        C4["WordNet Lemmatization (Root Reduction)"]
+        C5["TF-IDF Vectorizer<br/>(N-grams (1,2), max_features=5000, Sublinear TF)"]
+    end
+
+    subgraph ML["4. Machine Learning Inference Engine (`src/predict.py`)"]
+        D1["CalibratedClassifierCV (LinearSVC)"]
+        D2["Calibrated Probability Estimation (%)"]
+        D3["Department Routing Logic"]
+    end
+
+    subgraph DB["5. Persistence & Storage Layer (`src/database.py`)"]
+        E1[("SQLite Database<br/>`database/database.db`")]
+        E2["Audit Logging & Resolution Tracking"]
+    end
+
+    %% Flow Connections
+    A1 -->|HTTP POST Form / JSON| B1
+    A2 & A3 & A4 -->|HTTP GET Request| B1
+    B1 --> B2 --> B3
+    B3 --> C1 --> C2 --> C3 --> C4 --> C5
+    C5 --> D1 --> D2 --> D3
+    D3 --> E1 & E2
+    E1 --> B1
+    D3 -->|Render Result & Metrics| A1
+```
 
 ---
 
-## 📊 4. TF-IDF Feature Extraction & Data Leakage Prevention
+## 🗂️ 3. Complaint Categories & Department Routing
 
-- **TF-IDF Configuration**:
-  - `ngram_range = (1, 2)` (Unigrams and Bigrams)
-  - `max_features = 5000` (Top 5,000 most informative n-gram features)
-  - `sublinear_tf = True` (Applies logarithmic sublinear term-frequency scaling: $1 + \log(\text{tf})$)
-  - `norm = 'l2'` (Cosine normalization)
+The system classifies complaints across **6 mutually exclusive categories**:
 
-- **Methodological Rigor (Zero Data Leakage)**:
-  - Dataset is partitioned using **80/20 Stratified Train-Test Split** (`test_size=0.20`, `random_state=42`, `stratify=y`).
-  - The `TfidfVectorizer` is **fitted strictly on the training set (`X_train`) only**.
-  - The test set (`X_test`) is transformed using the pre-fitted vectorizer (`vectorizer.transform(X_test)`), ensuring no test distribution information leaks into feature extraction or model training.
+| # | Complaint Category | Scope & Example Grievances | Target Department |
+|:---:|:---|:---|:---|
+| 1 | 💳 **Payment Issue** | Payment deducted but order unconfirmed, gateway timeout, double charges | **Finance / Payments Team** |
+| 2 | 🧾 **Billing Issue** | Unexpected recurring charges, invoice calculation errors, disputed fees | **Billing Department** |
+| 3 | 🔧 **Technical Issue** | Mobile application crashes, HTTP 500 server errors, UI glitch, API failure | **Technical Support / IT** |
+| 4 | 📦 **Delivery Issue** | Delayed parcels, broken items on arrival, inaccurate tracking updates | **Logistics & Delivery** |
+| 5 | 👤 **Account Issue** | Password reset failure, 2FA code not received, account lockout | **Account & Security Team** |
+| 6 | 🎧 **Service Issue** | Rude representative behavior, prolonged hold times, unhelpful staff | **Customer Support / Escalations** |
 
 ---
 
-## 🏆 5. Machine Learning Models & Evaluation Benchmark
+## 🔬 4. NLP Preprocessing & Feature Extraction
 
-All models were evaluated on the held-out 20% stratified test set:
+### Preprocessing Pipeline (`src/preprocessing.py`)
+1. **Case Normalization**: Converts all text to lowercase to ensure vocabulary uniformity.
+2. **Contraction Expansion**: Replaces English contractions (e.g., `can't` $\to$ `cannot`, `wasn't` $\to$ `was not`).
+3. **Regex Noise Stripping**: Strips URLs (`https?://\S+`), email addresses, HTML tags, punctuation, and digits.
+4. **Tokenization**: Uses NLTK's `word_tokenize` to segment strings into grammatical tokens.
+5. **Stop-Word Removal**: Removes non-discriminative words using NLTK's English stopword corpus.
+6. **WordNet Lemmatization**: Reduces inflected variants to canonical dictionary lemmas (`crashes`, `crashing` $\to$ `crash`).
 
-| Machine Learning Model | Test Accuracy | Precision (Weighted) | Recall (Weighted) | F1-Score (Weighted) | Status |
+### TF-IDF Feature Extraction (`src/feature_extraction.py`)
+- **N-gram Range**: $(1, 2)$ — Captures both single keywords and two-word phrases.
+- **Max Features**: $5,000$ most informative lexical features.
+- **Sublinear TF Scaling**: Replaces term frequency $\text{tf}$ with $1 + \log(\text{tf})$ to dampen the influence of repeated words.
+- **Normalization**: $L_2$ Euclidean normalization.
+
+$$\text{TF-IDF}(t, d, D) = (1 + \log(\text{tf}(t, d))) \times \log\left(\frac{1 + |D|}{1 + \text{df}(t, D)}\right) + 1$$
+
+> **Academic Rigor — Zero Data Leakage**:
+> The `TfidfVectorizer` is **fitted exclusively on the training split (`X_train`)**. The test set (`X_test`) is transformed using the pre-fitted vocabulary, guaranteeing zero test set contamination.
+
+---
+
+## 🏆 5. Machine Learning Model Evaluation Benchmark
+
+All candidate models were trained and benchmarked on a stratified 80/20 train-test split ($N = 2,450$ complaints):
+
+| Algorithm | Test Accuracy | Precision (Weighted) | Recall (Weighted) | F1-Score (Weighted) | Status |
 |:---|:---:|:---:|:---:|:---:|:---:|
 | 🥇 **Linear Support Vector Machine (LinearSVC)** | **98.37%** | **98.51%** | **98.37%** | **98.38%** | 🏆 **Best Model (Production)** |
-| 🥈 **Logistic Regression** | 97.55% | 97.72% | 97.55% | 97.56% | Benchmark |
-| 🥉 **Multinomial Naive Bayes** | 96.73% | 96.87% | 96.73% | 96.74% | Benchmark |
+| 🥈 **Logistic Regression** | **97.55%** | **97.72%** | **97.55%** | **97.56%** | Benchmark |
+| 🥉 **Multinomial Naive Bayes** | **96.73%** | **96.87%** | **96.73%** | **96.74%** | Benchmark |
 
-*Linear SVM with probability calibration via `CalibratedClassifierCV` is deployed as the active production model.*
+### 6×6 Confusion Matrix (Linear SVM)
+
+| Actual \ Predicted | Account | Billing | Delivery | Payment | Service | Technical |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Account** | **78** | 0 | 0 | 0 | 0 | 1 |
+| **Billing** | 0 | **83** | 0 | 1 | 0 | 0 |
+| **Delivery** | 0 | 0 | **81** | 0 | 1 | 0 |
+| **Payment** | 0 | 1 | 0 | **82** | 0 | 0 |
+| **Service** | 0 | 0 | 1 | 0 | **80** | 1 |
+| **Technical** | 1 | 0 | 0 | 0 | 1 | **80** |
 
 ---
 
@@ -85,68 +134,72 @@ All models were evaluated on the held-out 20% stratified test set:
 
 ```
 customer-complaint-classification/
-├── app.py                     # Flask application entry point & routes
-├── requirements.txt           # Python dependencies
-├── .gitignore                 # Excludes caches, venvs, and sqlite databases
-├── README.md                  # Comprehensive project documentation
+├── app.py                     # Flask application entry point & API routes
+├── requirements.txt           # Python dependency specifications
+├── .gitignore                 # Exclusion rules for virtual environments & caches
+├── README.md                  # Comprehensive academic & operational documentation
 ├── dataset/
-│   ├── generate_dataset.py    # Balanced dataset generator
-│   ├── complaints.csv         # Labeled complaints dataset (2,450 samples)
-│   └── README.md              # Dataset schema documentation
+│   ├── generate_dataset.py    # Balanced dataset generator (2,450 labeled samples)
+│   ├── complaints.csv         # Labeled complaints dataset
+│   └── README.md              # Dataset schema & distribution documentation
 ├── src/
 │   ├── __init__.py            # Package initialization
 │   ├── preprocessing.py       # Full NLP cleaning, tokenization & lemmatization
-│   ├── feature_extraction.py  # TF-IDF vectorization & feature pipeline
-│   ├── train_model.py         # Model training & serialization
+│   ├── feature_extraction.py  # TF-IDF vectorizer configuration & extraction
+│   ├── train_model.py         # Multi-model training, calibration & serialization
 │   ├── evaluate_model.py      # Classification reports, confusion matrices & metrics
-│   ├── predict.py             # Production inference engine & department routing
-│   └── database.py            # SQLite schema, CRUD operations & analytics aggregations
+│   ├── predict.py             # Inference engine & department routing
+│   └── database.py            # SQLite schema, CRUD operations & analytics queries
 ├── models/
 │   ├── complaint_model.pkl    # Serialized production classifier (Calibrated LinearSVC)
-│   ├── tfidf_vectorizer.pkl   # Serialized TF-IDF vectorizer
-│   └── model_metrics.json     # Benchmarking results and evaluation reports
+│   ├── tfidf_vectorizer.pkl   # Serialized TF-IDF vectorizer artifact
+│   ├── label_encoder.pkl      # Serialized class label encoder
+│   └── model_metrics.json     # Benchmark evaluation metrics & reports
 ├── templates/
-│   ├── base.html              # Base layout with dark navy sidebar & topbar
-│   ├── index.html             # Complaint input & classification interface
-│   ├── result.html            # Classification result, confidence & department routing
-│   ├── dashboard.html         # Interactive analytics with Chart.js (all 6 categories)
-│   ├── history.html           # Complaint history table with filters & status toggle
+│   ├── base.html              # Base template with responsive dark navy sidebar & topbar
+│   ├── index.html             # Complaint submission UI with live character count
+│   ├── result.html            # Detailed classification result & probability gauge
+│   ├── dashboard.html         # Interactive analytics dashboard with Chart.js
+│   ├── history.html           # Complaint audit log with filtering & status updates
 │   ├── model_comparison.html  # Model benchmark table, radar chart & 6x6 confusion matrix
 │   ├── about.html             # Academic project documentation & system workflow
-│   └── error.html             # Error handling page (404/500)
+│   └── error.html             # Error handling template (404/500)
 ├── static/
 │   ├── css/
-│   │   └── style.css          # Unified light-theme academic styling
+│   │   └── style.css          # Unified light-theme academic design system
 │   └── js/
 │       ├── main.js            # General UI helpers
-│       ├── dashboard.js       # Dashboard counter animation
+│       ├── dashboard.js       # Animated counter utilities
 │       ├── history.js         # Status update AJAX handler
 │       └── model_comparison.js# Dynamic confusion matrix fetcher
 ├── docs/
-│   ├── ARCHITECTURE.md        # Architectural design document
-│   └── API_DOCUMENTATION.md   # REST API endpoint specifications
+│   ├── ARCHITECTURE.md        # Architectural design specifications
+│   ├── API_DOCUMENTATION.md   # REST API endpoint documentation
+│   └── PROJECT_REPORT.md      # Comprehensive academic project report
 └── tests/
     └── test_all.py            # 47 comprehensive unit & integration tests
 ```
 
 ---
 
-## ⚙️ 7. Installation & Setup
+## 🚀 7. Quick Start & Installation
 
 ### Prerequisites
-- Python 3.10, 3.11, 3.12, or 3.13
-- Git
+- **Python**: 3.10, 3.11, 3.12, or 3.13
+- **Git**
 
-### Step 1: Clone Repository & Set Up Virtual Environment
+### Step 1: Clone Repository & Create Virtual Environment
 ```bash
-git clone <repository_url>
+git clone https://github.com/sairajnaikwade/customer-complaint-classification.git
 cd customer-complaint-classification
+
+# Create virtual environment
 python -m venv venv
 
-# On Windows:
+# Activate virtual environment:
+# Windows (PowerShell / Command Prompt):
 venv\Scripts\activate
-
-# On macOS/Linux:
+# macOS / Linux:
 source venv/bin/activate
 ```
 
@@ -160,50 +213,104 @@ python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk
 ```bash
 python -m pytest tests/test_all.py -v
 ```
-*Expected result: 47 passed.*
+*Expected output: `47 passed`.*
 
-### Step 4: (Optional) Retrain the Machine Learning Models
+### Step 4: (Optional) Retrain Models
 ```bash
 python src/train_model.py
 ```
 
-### Step 5: Launch the Web Application
+### Step 5: Launch the Application
 ```bash
 python app.py
 ```
-Open your browser and navigate to: **`http://127.0.0.1:5000`**
+Access the application in your browser at: **`http://127.0.0.1:5000`**
 
 ---
 
-## 📡 8. REST API Endpoints
+## 📡 8. REST API Specifications
 
-| Method | Endpoint | Description |
-|:---|:---|:---|
-| `POST` | `/predict` | Classify complaint text (accepts form data or JSON `{"complaint": "..."}`) |
-| `GET` | `/api/dashboard` | JSON dashboard statistics and best model summary |
-| `GET` | `/api/history` | Query complaint records with optional search, category, and status filters |
-| `POST` | `/api/history/<id>/status` | Update complaint status (`Pending` / `Resolved`) |
-| `GET` | `/api/model-comparison` | Full benchmark comparison table, confusion matrix, and model info |
-| `GET` | `/api/confusion-matrix/<model>` | Confusion matrix for a specific model |
+### 1. Predict Complaint Category
+- **Endpoint**: `POST /predict`
+- **Headers**: `Content-Type: application/json`
+- **Request Body**:
+  ```json
+  {
+    "complaint": "My payment was deducted from my account but the order was never confirmed."
+  }
+  ```
+- **Response (`200 OK`)**:
+  ```json
+  {
+    "id": 1,
+    "category": "Payment Issue",
+    "confidence": 98.42,
+    "department": "Finance / Payments Team",
+    "top_features": ["payment", "deducted", "order", "confirmed"],
+    "all_probabilities": {
+      "Account Issue": 0.003,
+      "Billing Issue": 0.008,
+      "Delivery Issue": 0.002,
+      "Payment Issue": 0.9842,
+      "Service Issue": 0.001,
+      "Technical Issue": 0.0018
+    }
+  }
+  ```
+
+### 2. Dashboard Analytics
+- **Endpoint**: `GET /api/dashboard`
+- **Response (`200 OK`)**:
+  ```json
+  {
+    "stats": {
+      "total": 45,
+      "resolved": 28,
+      "pending": 17,
+      "by_category": {
+        "Payment Issue": 12,
+        "Technical Issue": 9,
+        "Delivery Issue": 8,
+        "Billing Issue": 7,
+        "Account Issue": 5,
+        "Service Issue": 4
+      },
+      "avg_score": 97.85
+    },
+    "best_model": {
+      "model": "Linear Support Vector Machine",
+      "accuracy": 98.37,
+      "precision": 98.51,
+      "recall": 98.37,
+      "f1_score": 98.38
+    }
+  }
+  ```
 
 ---
 
 ## 🛠️ 9. Technology Stack
 
-- **Core Language**: Python 3.13
-- **Web Framework**: Flask 3.1
-- **Machine Learning**: scikit-learn 1.6+ (LinearSVC, LogisticRegression, MultinomialNB, CalibratedClassifierCV)
-- **NLP Library**: NLTK 3.9+ (Tokenization, Stopwords, WordNet Lemmatizer)
-- **Data Handling**: Pandas & NumPy
-- **Database**: SQLite3
-- **Visualization**: Chart.js 4.4
-- **Testing**: pytest 9.1+
+| Domain | Technology | Purpose |
+|:---|:---|:---|
+| **Core Language** | Python 3.13 | Core runtime and backend scripting |
+| **Web Framework** | Flask 3.1 | Application routing, Jinja2 template rendering, REST API |
+| **Machine Learning** | scikit-learn 1.6+ | LinearSVC, Logistic Regression, MultinomialNB, CalibratedClassifierCV |
+| **NLP Engine** | NLTK 3.9+ | Tokenization, English stopwords filtering, WordNet Lemmatizer |
+| **Data Processing** | Pandas 2.2+, NumPy 2.0+ | Dataset manipulation, array operations, matrix transformations |
+| **Database** | SQLite3 | Embedded thread-safe audit logging & CRUD operations |
+| **Data Visualization** | Chart.js 4.4 | Responsive bar, donut, and radar performance charts |
+| **Automated Testing** | pytest 9.1+ | 47 unit and integration tests |
 
 ---
 
-## 🎓 Academic Attribution
+## 👥 10. Academic Attribution
+
 - **Project**: Customer Complaint Classification System
 - **Subject**: Natural Language Processing (NLP) — Project-Based Learning (PBL)
 - **Institution**: Sanjivani College of Engineering, Kopargaon
+- **Department**: Department of Computer Engineering
 - **Academic Year**: 2026–27
+- **Author**: Sairaj Naikwade
+
 
