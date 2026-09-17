@@ -12,7 +12,8 @@ import numpy as np
 from typing import Tuple, List, Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-VECTORIZER_PATH = os.path.join("models", "tfidf_vectorizer.pkl")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VECTORIZER_PATH = os.path.join(BASE_DIR, "models", "tfidf_vectorizer.pkl")
 
 
 def create_vectorizer(

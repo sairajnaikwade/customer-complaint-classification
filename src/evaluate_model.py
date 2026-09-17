@@ -10,7 +10,8 @@ model-comparison page rendering.
 import os
 import json
 
-METRICS_PATH = os.path.join("models", "model_metrics.json")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+METRICS_PATH = os.path.join(BASE_DIR, "models", "model_metrics.json")
 
 
 def load_metrics() -> dict:

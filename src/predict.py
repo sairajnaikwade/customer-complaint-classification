@@ -17,12 +17,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.preprocessing import clean_text, get_pipeline_steps_breakdown
 from src.feature_extraction import load_vectorizer, get_top_tfidf_features
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
-MODEL_PATH         = os.path.join("models", "complaint_model.pkl")
-VECTORIZER_PATH    = os.path.join("models", "tfidf_vectorizer.pkl")
-LABEL_ENCODER_PATH = os.path.join("models", "label_encoder.pkl")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH         = os.path.join(BASE_DIR, "models", "complaint_model.pkl")
+VECTORIZER_PATH    = os.path.join(BASE_DIR, "models", "tfidf_vectorizer.pkl")
+LABEL_ENCODER_PATH = os.path.join(BASE_DIR, "models", "label_encoder.pkl")
 
 # ---------------------------------------------------------------------------
 # Department routing map (rule-based layer; separate from ML prediction)

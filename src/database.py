@@ -8,16 +8,31 @@ import sqlite3
 from datetime import datetime, timezone
 from contextlib import contextmanager
 
-DB_PATH = os.path.join("database", "database.db")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# On Vercel / serverless, use the writable /tmp directory
+if os.environ.get("VERCEL"):
+    DB_PATH = os.path.join("/tmp", "database.db")
+else:
+    DB_PATH = os.path.join(BASE_DIR, "database", "database.db")
 
 
 def get_connection():
     """Opens a thread-safe SQLite connection with row factory."""
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
+    global DB_PATH
+    try:
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL;")
+        return conn
+    except sqlite3.OperationalError:
+        # Fallback to /tmp in read-only serverless container
+        DB_PATH = os.path.join("/tmp", "database.db")
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        return conn
 
 
 @contextmanager
